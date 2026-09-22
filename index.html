@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flores Amarillas para Vanessa 🌻💛</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-yellow: #ffd700;
+      --gold: #ffb703;
+      --warm-amber: #fb8500;
+      --soft-yellow: #fff3b0;
+      --night-bg-1: #0d0f1a;
+      --night-bg-2: #1b1a2e;
+      --night-bg-3: #2d1e2f;
+      --text-light: #fefae0;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 215, 0, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at top center, var(--night-bg-2), var(--night-bg-1) 70%, #05060a);
+      color: var(--text-light);
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Canvas de fondo para estrellas y pétalos */
+    #background-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Contenedor principal */
+    .app-container {
+      position: relative;
+      z-index: 10;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.2rem 5rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Audio Controller */
+    .music-player {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(18, 18, 28, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 50px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+    .music-player:hover {
+      transform: scale(1.05);
+      border-color: var(--primary-yellow);
+    }
+    .music-icon {
+      font-size: 1.2rem;
+      animation: pulseMusic 2s infinite ease-in-out;
+    }
+    .music-text {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--soft-yellow);
+    }
+
+    @keyframes pulseMusic {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2) rotate(10deg); }
+    }
+
+    /* Header */
+    .header-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(251, 133, 0, 0.2));
+      border: 1px solid var(--primary-yellow);
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--soft-yellow);
+      margin-bottom: 1.2rem;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    }
+
+    .main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 10%, #ffd700 50%, #ffb703 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.8rem;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    }
+
+    .name-highlight {
+      font-family: 'Caveat', cursive;
+      font-size: 4rem;
+      display: block;
+      color: #ffd700;
+      -webkit-text-fill-color: #ffd700;
+      text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+      transform: rotate(-2deg);
+      margin: 0.2rem 0;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #e0e1dd;
+      max-width: 600px;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Flores Animadas en SVG/Canvas */
+    .flower-garden-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 380px;
+      margin: 1rem auto 2.5rem auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .garden-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.45));
+    }
+
+    /* Animaciones de florecer */
+    .flower-stem {
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+      animation: growStem 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .flower-leaf {
+      transform-origin: bottom center;
+      transform: scale(0);
+      animation: growLeaf 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.5s forwards;
+    }
+    .flower-head {
+      transform-origin: center;
+      transform: scale(0) rotate(-45deg);
+      animation: bloomFlower 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2s forwards;
+    }
+    .flower-sway-1 {
+      transform-origin: bottom center;
+      animation: sway 6s ease-in-out infinite alternate;
+    }
+    .flower-sway-2 {
+      transform-origin: bottom center;
+      animation: sway 5s ease-in-out infinite alternate-reverse;
+    }
+    .flower-sway-3 {
+      transform-origin: bottom center;
+      animation: sway 7s ease-in-out infinite alternate 1s;
+    }
+
+    @keyframes growStem {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes growLeaf {
+      to { transform: scale(1); }
+    }
+    @keyframes bloomFlower {
+      to { transform: scale(1) rotate(0deg); }
+    }
+    @keyframes sway {
+      0% { transform: rotate(-3deg); }
+      100% { transform: rotate(3deg); }
+    }
+
+    /* Glow pulsante de las flores */
+    .sunflower-center {
+      animation: pulseGlow 3s infinite alternate ease-in-out;
+    }
+    @keyframes pulseGlow {
+      0% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4)); }
+      100% { filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.9)); }
+    }
+
+    /* Tarjetas Interactivas */
+    .section-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      margin-bottom: 2.5rem;
+    }
+
+    .romantic-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 1.8rem;
+      text-align: left;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .romantic-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary-yellow), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .romantic-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 215, 0, 0.6);
+      box-shadow: 0 12px 30px rgba(255, 215, 0, 0.15);
+    }
+    .romantic-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      display: inline-block;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--soft-yellow);
+      margin-bottom: 0.6rem;
+    }
+    .card-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #cfd2cd;
+      font-weight: 300;
+    }
+
+    /* Carta de Amor Principal */
+    .love-letter-container {
+      width: 100%;
+      background: linear-gradient(145deg, rgba(30, 25, 45, 0.85), rgba(20, 18, 30, 0.9));
+      border: 1px solid rgba(255, 215, 0, 0.35);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      margin-bottom: 3rem;
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255, 215, 0, 0.05);
+      text-align: left;
+    }
+    .love-letter-container::after {
+      content: '💛';
+      position: absolute;
+      bottom: -15px;
+      right: 30px;
+      font-size: 2rem;
+      background: #12101e;
+      padding: 0 10px;
+      border-radius: 50%;
+    }
+
+    .letter-title {
+      font-family: 'Caveat', cursive;
+      font-size: 2.5rem;
+      color: var(--primary-yellow);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .letter-body {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #eae2b7;
+      font-weight: 300;
+      margin-bottom: 1.2rem;
+    }
+    .letter-body strong {
+      color: #ffd700;
+      font-weight: 600;
+    }
+    .letter-signature {
+      font-family: 'Caveat', cursive;
+      font-size: 2rem;
+      color: var(--gold);
+      text-align: right;
+      margin-top: 1.5rem;
+    }
+
+    /* Botones de acción interactiva */
+    .interactive-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+
+    .action-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .magic-btn {
+      background: linear-gradient(135deg, #ffd700, #ff9e00);
+      color: #12101e;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 25px rgba(255, 183, 3, 0.4);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .magic-btn:hover {
+      transform: scale(1.06) translateY(-3px);
+      box-shadow: 0 12px 30px rgba(255, 183, 3, 0.6);
+      background: linear-gradient(135deg, #ffe066, #ffa200);
+    }
+    .magic-btn:active {
+      transform: scale(0.96);
+    }
+
+    .magic-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fefae0;
+      border: 1px solid var(--primary-yellow);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .magic-btn.secondary:hover {
+      background: rgba(255, 215, 0, 0.15);
+      border-color: #ffd700;
+    }
+
+    /* Mensajes emergentes (Sweet Modal / Toasts) */
+    .floating-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(18, 16, 30, 0.95);
+      border: 2px solid var(--primary-yellow);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      padding: 2.2rem;
+      max-width: 90%;
+      width: 420px;
+      z-index: 1000;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(255, 215, 0, 0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .floating-popup.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .popup-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .popup-title {
+      font-family: 'Caveat', cursive;
+      font-size: 2.4rem;
+      color: var(--primary-yellow);
+      margin-bottom: 0.5rem;
+    }
+    .popup-text {
+      font-size: 1.05rem;
+      color: #fefae0;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Botón cerrar modal */
+    .popup-close {
+      background: var(--gold);
+      color: #0b0914;
+      font-weight: 700;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .popup-close:hover {
+      background: #ffd700;
+      transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 2rem;
+    }
+    footer span {
+      color: #ff6b6b;
+      animation: heartbeat 1.5s infinite;
+      display: inline-block;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .main-title { font-size: 2.1rem; }
+      .name-highlight { font-size: 3.2rem; }
+      .flower-garden-container { height: 300px; }
+      .love-letter-container { padding: 1.8rem 1.2rem; }
+      .letter-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas de Estrellas y Pétalos -->
+  <canvas id="background-canvas"></canvas>
+
+  <!-- Control de Música -->
+  <div class="music-player" id="music-btn" title="Activar/Desactivar melodía">
+    <span class="music-icon">🎵</span>
+    <span class="music-text" id="music-status">Toca para música ✨</span>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- Encabezado -->
+    <div class="header-badge">🌻 Un detalle eterno para ti 🌻</div>
+    <h1 class="main-title">
+      Flores Amarillas para
+      <span class="name-highlight">Vanessa</span>
+    </h1>
+    <p class="subtitle">
+      Dicen que las flores amarillas representan la luz, la felicidad incondicional y el amor verdadero. Hoy quiero que tengas tu propio jardín que nunca se marchitará.
+    </p>
+
+    <!-- Ramillete de Flores SVG Animadas -->
+    <div class="flower-garden-container">
+      <svg class="garden-svg" viewBox="0 0 500 450" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Gradiente Petalos -->
+          <linearGradient id="petal-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff066" />
+            <stop offset="60%" stop-color="#ffd700" />
+            <stop offset="100%" stop-color="#f77f00" />
+          </linearGradient>
+          <linearGradient id="petal-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffe600" />
+            <stop offset="70%" stop-color="#ff9e00" />
+            <stop offset="100%" stop-color="#d62828" />
+          </linearGradient>
+          <!-- Centro de Girasol -->
+          <radialGradient id="sunflower-core" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#7f4f24" />
+            <stop offset="70%" stop-color="#432818" />
+            <stop offset="100%" stop-color="#24140e" />
+          </radialGradient>
+          <!-- Tallo -->
+          <linearGradient id="stem-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#38b000" />
+            <stop offset="100%" stop-color="#007200" />
+          </linearGradient>
+        </defs>
+
+        <!-- Flor 1 (Izquierda) -->
+        <g class="flower-sway-2">
+          <!-- Tallo -->
+          <path class="flower-stem" d="M 170,430 Q 150,290 180,180" fill="none" stroke="url(#stem-grad)" stroke-width="8" stroke-linecap="round"/>
+          <!-- Hojas -->
+          <path class="flower-leaf" d="M 160,320 Q 90,300 110,260 C 135,275 155,300 160,320 Z" fill="#38b000" opacity="0.9"/>
+          <!-- Cabeza de la flor -->
+          <g class="flower-head" style="transform-origin: 180px 180px;">
+            <!-- Pétalos circulares -->
+            <g>
+              <ellipse cx="180" cy="120" rx="16" ry="42" fill="url(#petal-grad-1)"/>
+              <ellipse cx="180" cy="240" rx="16" ry="42" fill="url(#petal-grad-1)"/>
+              <ellipse cx="120" cy="180" rx="42" ry="16" fill="url(#petal-grad-1)"/>
+              <ellipse cx="240" cy="180" rx="42" ry="16" fill="url(#petal-grad-1)"/>
+              <ellipse cx="137" cy="137" rx="40" ry="16" transform="rotate(45 137 137)" fill="url(#petal-grad-1)"/>
+              <ellipse cx="223" cy="223" rx="40" ry="16" transform="rotate(45 223 223)" fill="url(#petal-grad-1)"/>
+              <ellipse cx="223" cy="137" rx="40" ry="16" transform="rotate(-45 223 137)" fill="url(#petal-grad-1)"/>
+              <ellipse cx="137" cy="223" rx="40" ry="16" transform="rotate(-45 137 223)" fill="url(#petal-grad-1)"/>
+            </g>
+            <!-- Centro -->
+            <circle cx="180" cy="180" r="28" fill="url(#sunflower-core)" stroke="#ffd700" stroke-width="2"/>
+            <circle cx="180" cy="180" r="20" fill="none" stroke="#e09f3e" stroke-dasharray="4,4"/>
+          </g>
+        </g>
+
+        <!-- Flor 2 (Derecha) -->
+        <g class="flower-sway-3">
+          <!-- Tallo -->
+          <path class="flower-stem" d="M 320,440 Q 350,300 320,190" fill="none" stroke="url(#stem-grad)" stroke-width="8" stroke-linecap="round"/>
+          <!-- Hojas -->
+          <path class="flower-leaf" d="M 335,310 Q 400,290 380,250 C 355,270 340,295 335,310 Z" fill="#38b000" opacity="0.9"/>
+          <!-- Cabeza de la flor -->
+          <g class="flower-head" style="transform-origin: 320px 190px;">
+            <g>
+              <ellipse cx="320" cy="130" rx="15" ry="38" fill="url(#petal-grad-1)"/>
+              <ellipse cx="320" cy="250" rx="15" ry="38" fill="url(#petal-grad-1)"/>
+              <ellipse cx="260" cy="190" rx="38" ry="15" fill="url(#petal-grad-1)"/>
+              <ellipse cx="380" cy="190" rx="38" ry="15" fill="url(#petal-grad-1)"/>
+              <ellipse cx="277" cy="147" rx="36" ry="15" transform="rotate(45 277 147)" fill="url(#petal-grad-1)"/>
+              <ellipse cx="363" cy="233" rx="36" ry="15" transform="rotate(45 363 233)" fill="url(#petal-grad-1)"/>
+              <ellipse cx="363" cy="147" rx="36" ry="15" transform="rotate(-45 363 147)" fill="url(#petal-grad-1)"/>
+              <ellipse cx="277" cy="233" rx="36" ry="15" transform="rotate(-45 277 233)" fill="url(#petal-grad-1)"/>
+            </g>
+            <circle cx="320" cy="190" r="26" fill="url(#sunflower-core)" stroke="#ffd700" stroke-width="2"/>
+            <circle cx="320" cy="190" r="18" fill="none" stroke="#e09f3e" stroke-dasharray="3,3"/>
+          </g>
+        </g>
+
+        <!-- Flor 3 (Centro - La Más Grande y Brillante) -->
+        <g class="flower-sway-1">
+          <!-- Tallo central -->
+          <path class="flower-stem" d="M 250,450 Q 240,260 250,130" fill="none" stroke="url(#stem-grad)" stroke-width="11" stroke-linecap="round"/>
+          <!-- Hojas grandes -->
+          <path class="flower-leaf" d="M 245,280 Q 150,260 170,200 C 205,225 235,255 245,280 Z" fill="#2d6a4f"/>
+          <path class="flower-leaf" d="M 255,250 Q 350,230 330,170 C 295,195 265,225 255,250 Z" fill="#2d6a4f"/>
+
+          <!-- Cabeza Flor Principal -->
+          <g class="flower-head" style="transform-origin: 250px 130px;">
+            <!-- Capa de Pétalos 1 (Fondo) -->
+            <g fill="url(#petal-grad-2)">
+              <ellipse cx="250" cy="50" rx="18" ry="55"/>
+              <ellipse cx="250" cy="210" rx="18" ry="55"/>
+              <ellipse cx="170" cy="130" rx="55" ry="18"/>
+              <ellipse cx="330" cy="130" rx="55" ry="18"/>
+              <ellipse cx="193" cy="73" rx="52" ry="18" transform="rotate(45 193 73)"/>
+              <ellipse cx="307" cy="187" rx="52" ry="18" transform="rotate(45 307 187)"/>
+              <ellipse cx="307" cy="73" rx="52" ry="18" transform="rotate(-45 307 73)"/>
+              <ellipse cx="193" cy="187" rx="52" ry="18" transform="rotate(-45 193 187)"/>
+            </g>
+            <!-- Capa de Pétalos 2 (Frente rotada) -->
+            <g fill="url(#petal-grad-1)">
+              <ellipse cx="250" cy="58" rx="16" ry="46" transform="rotate(22.5 250 130)"/>
+              <ellipse cx="250" cy="202" rx="16" ry="46" transform="rotate(22.5 250 130)"/>
+              <ellipse cx="178" cy="130" rx="46" ry="16" transform="rotate(22.5 250 130)"/>
+              <ellipse cx="322" cy="130" rx="46" ry="16" transform="rotate(22.5 250 130)"/>
+              <ellipse cx="199" cy="79" rx="44" ry="16" transform="rotate(67.5 250 130)"/>
+              <ellipse cx="301" cy="181" rx="44" ry="16" transform="rotate(67.5 250 130)"/>
+              <ellipse cx="301" cy="79" rx="44" ry="16" transform="rotate(-22.5 250 130)"/>
+              <ellipse cx="199" cy="181" rx="44" ry="16" transform="rotate(-22.5 250 130)"/>
+            </g>
+            <!-- Centro Luminoso -->
+            <circle class="sunflower-center" cx="250" cy="130" r="38" fill="url(#sunflower-core)" stroke="#ffd700" stroke-width="3"/>
+            <circle cx="250" cy="130" r="28" fill="none" stroke="#d4a373" stroke-dasharray="5,5" stroke-width="2"/>
+            <circle cx="250" cy="130" r="16" fill="#3c1e08" opacity="0.6"/>
+            <!-- Pequeño destello de luz -->
+            <circle cx="236" cy="116" r="6" fill="#ffffff" opacity="0.5"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Botones Interactivos Principales -->
+    <div class="interactive-section">
+      <div class="action-btn-group">
+        <button class="magic-btn" onclick="triggerHug()">
+          <span>🤗</span> Enviar un Abrazo Virtual
+        </button>
+        <button class="magic-btn secondary" onclick="triggerSecretMessage()">
+          <span>✨</span> Un Mensaje Secreto
+        </button>
+        <button class="magic-btn secondary" onclick="triggerLoveReason()">
+          <span>💖</span> ¿Por qué te amo?
+        </button>
+      </div>
+    </div>
+
+    <!-- Carta de Amor para Vanessa -->
+    <div class="love-letter-container">
+      <div class="letter-title">Mi querida Vanessa 🌻</div>
+      <p class="letter-body">
+        Dicen que las personas especiales llegan a nuestra vida para llenarla de color, pero tú hiciste mucho más: <strong>te convertiste en mi lugar favorito y en mi mayor alegría</strong>.
+      </p>
+      <p class="letter-body">
+        Estas flores amarillas no solo representan la tradición, sino una promesa: que sin importar los días nublados, yo siempre buscaré ser el motivo de tu sonrisa más hermosa. Gracias por ser tan única, dulce y maravillosa.
+      </p>
+      <p class="letter-body">
+        Cada momento contigo es un regalo que atesoro con todo mi corazón. <strong>¡Nunca olvides lo increíble y valiosa que eres!</strong>
+      </p>
+      <div class="letter-signature">
+        Con todo mi amor siempre ✨💛
+      </div>
+    </div>
+
+    <!-- Tarjetas de Razones / Detalles Románticos -->
+    <div class="section-cards">
+      <div class="romantic-card">
+        <div class="card-icon">🌟</div>
+        <h3 class="card-title">Tu Sonrisa Radiante</h3>
+        <p class="card-text">Tiene el poder mágico de cambiar cualquier mal día en el mejor momento en solo un segundo.</p>
+      </div>
+      <div class="romantic-card">
+        <div class="card-icon">🍯</div>
+        <h3 class="card-title">Tu Dulzura Única</h3>
+        <p class="card-text">La manera tan tierna y bondadosa en la que tratas al mundo hace que me enamore más de ti.</p>
+      </div>
+      <div class="romantic-card">
+        <div class="card-icon">♾️</div>
+        <h3 class="card-title">Nuestro Camino Juntos</h3>
+        <p class="card-text">Por todas las risas compartidas, las historias que hemos vivido y todos los sueños que aún nos faltan por cumplir.</p>
+      </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer>
+      Creado con <span>❤️</span> exclusivamente para <strong>Vanessa</strong>
+    </footer>
+
+  </div>
+
+  <!-- Popups / Modales de Interacción -->
+  <div class="popup-overlay" id="popup-overlay" onclick="closePopup()"></div>
+  <div class="floating-popup" id="floating-popup">
+    <div class="popup-title" id="modal-title">¡Mensaje!</div>
+    <div class="popup-text" id="modal-body">Contenido aquí...</div>
+    <button class="popup-close" onclick="closePopup()">Guardar en el corazón 💛</button>
+  </div>
+
+  <script>
+    /* ======================================================
+       1. ANIMACIÓN DE FONDO: ESTRELLAS Y PÉTALOS FLOTANTES
+       ====================================================== */
+    const canvas = document.getElementById('background-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    let petals = [];
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Crear estrellas titilantes
+    for (let i = 0; i < 70; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random(),
+        speed: Math.random() * 0.02 + 0.005,
+        color: Math.random() > 0.3 ? '#ffd700' : '#ffffff'
+      });
+    }
+
+    // Crear pétalos amarillos que caen suavemente
+    function createPetal() {
+      return {
+        x: Math.random() * width,
+        y: -20,
+        size: Math.random() * 12 + 8,
+        speedY: Math.random() * 1.2 + 0.8,
+        speedX: Math.random() * 1 - 0.5,
+        rotation: Math.random() * 360,
+        rotationSpeed: Math.random() * 2 - 1,
+        opacity: Math.random() * 0.7 + 0.3
+      };
+    }
+
+    for (let i = 0; i < 25; i++) {
+      let p = createPetal();
+      p.y = Math.random() * height;
+      petals.push(p);
+    }
+
+    function animateBackground() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Dibujar estrellas
+      particles.forEach(p => {
+        p.alpha += p.speed;
+        if (p.alpha > 1 || p.alpha < 0.1) p.speed = -p.speed;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.abs(p.alpha);
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = p.color;
+        ctx.fill();
+      });
+
+      // Dibujar pétalos cayendo
+      ctx.shadowBlur = 0;
+      petals.forEach((p, idx) => {
+        p.y += p.speedY;
+        p.x += Math.sin(p.y * 0.01) * 0.8 + p.speedX;
+        p.rotation += p.rotationSpeed;
+
+        if (p.y > height + 20) {
+          petals[idx] = createPetal();
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rotation * Math.PI) / 180);
+        ctx.globalAlpha = p.opacity;
+
+        // Dibujar forma de pétalo
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-p.size / 2, -p.size, -p.size / 2, -p.size * 1.5, 0, -p.size * 2);
+        ctx.bezierCurveTo(p.size / 2, -p.size * 1.5, p.size / 2, -p.size, 0, 0);
+        ctx.fillStyle = '#ffcc00';
+        ctx.fill();
+        ctx.restore();
+      });
+
+      ctx.globalAlpha = 1.0;
+      requestAnimationFrame(animateBackground);
+    }
+    animateBackground();
+
+    /* ======================================================
+       2. MÚSICA ROMÁNTICA GENERADA CON SINTETIZADOR WEB AUDIO
+       (Funciona 100% offline y en cualquier navegador sin cortes)
+       ====================================================== */
+    let audioCtx = null;
+    let isPlaying = false;
+    let musicInterval = null;
+
+    const notes = [
+      261.63, 329.63, 392.00, 493.88, 523.25, 659.25, 783.99, // C4, E4, G4, B4, C5, E5, G5
+      349.23, 440.00, 523.25, 587.33, 698.46                  // F4, A4, C5, D5, F5
+    ];
+
+    const melodyProgression = [
+      [261.63, 329.63, 392.00, 523.25], // C Major
+      [220.00, 261.63, 329.63, 440.00], // A minor
+      [174.61, 220.00, 261.63, 349.23], // F Major
+      [196.00, 246.94, 293.66, 392.00]  // G Major
+    ];
+
+    let chordIdx = 0;
+    let noteIdx = 0;
+
+    function playSoftTone(freq, duration = 1.4) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function toggleMusic() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      isPlaying = !isPlaying;
+      const statusText = document.getElementById('music-status');
+
+      if (isPlaying) {
+        statusText.textContent = "Sonando melodía dulce 🎶";
+        musicInterval = setInterval(() => {
+          const currentChord = melodyProgression[chordIdx];
+          const noteFreq = currentChord[noteIdx];
+          playSoftTone(noteFreq * (Math.random() > 0.4 ? 1 : 2), 1.6);
+
+          noteIdx++;
+          if (noteIdx >= currentChord.length) {
+            noteIdx = 0;
+            chordIdx = (chordIdx + 1) % melodyProgression.length;
+          }
+        }, 450);
+      } else {
+        statusText.textContent = "Toca para música ✨";
+        clearInterval(musicInterval);
+      }
+    }
+    document.getElementById('music-btn').addEventListener('click', toggleMusic);
+
+    /* ======================================================
+       3. INTERACCIONES ROMÁNTICAS, TOQUES Y MODALES
+       ====================================================== */
+    const modal = document.getElementById('floating-popup');
+    const overlay = document.getElementById('popup-overlay');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+
+    // Toques en pantalla para generar corazoncitos dorados
+    document.addEventListener('pointerdown', (e) => {
+      // Si el click no fue en un botón o modal, crea una flor/corazón flotante en las coordenadas
+      if (e.target.closest('button') || e.target.closest('.floating-popup') || e.target.closest('.music-player')) return;
+      
+      const spark = document.createElement('div');
+      const emojis = ['💛', '✨', '🌻', '⭐', '💖', '🥰'];
+      spark.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+      spark.style.position = 'fixed';
+      spark.style.left = (e.clientX - 12) + 'px';
+      spark.style.top = (e.clientY - 12) + 'px';
+      spark.style.fontSize = '22px';
+      spark.style.zIndex = '999';
+      spark.style.pointerEvents = 'none';
+      spark.style.transition = 'all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1)';
+      spark.style.opacity = '1';
+      document.body.appendChild(spark);
+
+      setTimeout(() => {
+        spark.style.transform = `translate(${(Math.random() - 0.5) * 60}px, -70px) scale(1.4) rotate(${Math.random() * 40 - 20}deg)`;
+        spark.style.opacity = '0';
+      }, 30);
+
+      setTimeout(() => spark.remove(), 1300);
+    });
+
+    function openPopup(title, body) {
+      modalTitle.innerHTML = title;
+      modalBody.innerHTML = body;
+      modal.classList.add('active');
+      overlay.classList.add('active');
+    }
+
+    function closePopup() {
+      modal.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+
+    function triggerHug() {
+      // Lanzar explosión de corazones en pantalla
+      for (let i = 0; i < 35; i++) {
+        setTimeout(() => {
+          const heart = document.createElement('div');
+          heart.innerHTML = ['💛', '✨', '💖', '🥰', '🌻', '💫'][Math.floor(Math.random() * 6)];
+          heart.style.position = 'fixed';
+          heart.style.left = (Math.random() * 84 + 8) + 'vw';
+          heart.style.top = (Math.random() * 40 + 50) + 'vh';
+          heart.style.fontSize = (Math.random() * 25 + 20) + 'px';
+          heart.style.zIndex = '9999';
+          heart.style.transition = 'all 1.8s cubic-bezier(0.25, 1, 0.5, 1)';
+          heart.style.opacity = '1';
+          heart.style.pointerEvents = 'none';
+          document.body.appendChild(heart);
+
+          setTimeout(() => {
+            heart.style.transform = `translateY(-130px) scale(${Math.random() * 1.5 + 0.8})`;
+            heart.style.opacity = '0';
+          }, 50);
+
+          setTimeout(() => heart.remove(), 2000);
+        }, i * 35);
+      }
+
+      openPopup(
+        "¡Abrazo Gigante Enviado! 🤗💛",
+        "Imagina mis brazos rodeándote con toda la ternura del mundo. Recuerda que siempre estoy aquí para ti, cuidándote y deseando lo mejor para tu vida. ¡Te mando el abrazo más cálido de todos!"
+      );
+    }
+
+    const secretMessages = [
+      "Eres esa persona que con solo un 'Hola' me alegra el día entero. ✨",
+      "Si me pidieran definir la perfección, simplemente diría tu nombre: Vanessa. 💛",
+      "Cada segundo que paso pensando en ti se convierte en mi momento favorito del día. 🌻",
+      "Prometo cuidarte, respetarte y recordarte siempre lo valiosa y especial que eres. 🌟",
+      "No existe flor en el mundo que se compare con la luz y calidez de tu sonrisa. 💐",
+      "Gracias por existir y por llenar mi vida de alegría incondicional. 💛"
+    ];
+
+    function triggerSecretMessage() {
+      const randomMsg = secretMessages[Math.floor(Math.random() * secretMessages.length)];
+      openPopup("✨ Un Pensamiento Secreto ✨", `"${randomMsg}"`);
+    }
+
+    const loveReasons = [
+      "Porque tienes la mirada más noble, dulce y sincera que he conocido.",
+      "Porque cuando te ríes, haces que el mundo entero se sienta más bonito.",
+      "Por tu manera de hacerme sentir tan afortunado y en paz.",
+      "Por tu gran ternura y la forma en que iluminas todo a tu alrededor.",
+      "¡Simplemente porque eres Vanessa, el amor de mi vida y mi persona favorita!"
+    ];
+    let reasonIndex = 0;
+
+    function triggerLoveReason() {
+      const reason = loveReasons[reasonIndex];
+      reasonIndex = (reasonIndex + 1) % loveReasons.length;
+      openPopup("💛 ¿Por qué te amo tanto? 💛", `<strong>Razón especial:</strong><br><br>${reason}`);
+    }
+  </script>
+</body>
+</html>
