@@ -2,26 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <meta name="theme-color" content="#0d0f1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Flores Amarillas para Vanessa 🌻💛</title>
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
-  
   <style>
-    :root {
-      --primary-yellow: #ffd700;
-      --gold: #ffb703;
-      --warm-amber: #fb8500;
-      --soft-yellow: #fff3b0;
-      --night-bg: #0d0f1a;
-      --card-bg: rgba(255, 255, 255, 0.08);
-      --card-border: rgba(255, 215, 0, 0.3);
-      --text-main: #fefae0;
-    }
-
+    /* RESET Y ESTILOS BASE TOTALMENTE AUTOSUFICIENTES (CERO DEPENDENCIAS EXTERNAS) */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -29,18 +17,23 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html {
       background-color: #0d0f1a;
-      background: radial-gradient(circle at top center, #1e1b33 0%, #0d0f1a 70%, #06070a 100%);
       color: #fefae0;
-      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0d0f1a;
+      background: radial-gradient(circle at top center, #1f1a3a 0%, #0d0f1a 65%, #05060a 100%);
+      color: #fefae0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       min-height: 100vh;
       width: 100%;
       overflow-x: hidden;
       position: relative;
     }
 
-    /* Canvas de fondo */
+    /* Canvas de fondo para partículas y pétalos */
     #background-canvas {
       position: fixed;
       top: 0;
@@ -55,7 +48,7 @@
     .app-container {
       position: relative;
       z-index: 10;
-      max-width: 800px;
+      max-width: 650px;
       margin: 0 auto;
       padding: 1.5rem 1rem 4rem 1rem;
       display: flex;
@@ -70,16 +63,15 @@
       top: 15px;
       right: 15px;
       z-index: 100;
-      background: rgba(18, 18, 30, 0.85);
-      border: 1px solid var(--primary-yellow);
+      background: rgba(20, 18, 35, 0.9);
+      border: 1px solid #ffd700;
       border-radius: 30px;
       padding: 8px 14px;
       display: flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-      transition: transform 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
     }
     .music-player:active {
       transform: scale(0.95);
@@ -89,30 +81,30 @@
     }
     .music-text {
       font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--soft-yellow);
+      font-weight: 700;
+      color: #fff3b0;
     }
 
     /* Header */
     .header-badge {
       display: inline-block;
       background: rgba(255, 215, 0, 0.15);
-      border: 1px solid var(--primary-yellow);
+      border: 1px solid #ffd700;
       padding: 6px 16px;
       border-radius: 30px;
       font-size: 0.8rem;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--soft-yellow);
-      margin-top: 2rem;
+      color: #fff3b0;
+      margin-top: 1.8rem;
       margin-bottom: 1rem;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
     }
 
     .main-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 2.2rem;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 2.1rem;
       font-weight: 700;
       line-height: 1.2;
       color: #ffd700;
@@ -120,11 +112,11 @@
     }
 
     .name-highlight {
-      font-family: 'Caveat', cursive, sans-serif;
-      font-size: 3.5rem;
+      font-family: 'Brush Script MT', 'Segoe Script', 'Caveat', cursive, sans-serif;
+      font-size: 3.4rem;
       display: block;
       color: #ffd700;
-      text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+      text-shadow: 0 0 18px rgba(255, 215, 0, 0.7);
       transform: rotate(-2deg);
       margin: 0.2rem 0;
     }
@@ -132,20 +124,20 @@
     .subtitle {
       font-size: 0.95rem;
       color: #e0e1dd;
-      max-width: 550px;
-      margin-bottom: 1.5rem;
+      max-width: 520px;
+      margin-bottom: 1.2rem;
       line-height: 1.5;
       font-weight: 300;
       padding: 0 10px;
     }
 
-    /* Contenedor del Ramillete de Flores */
+    /* Flores SVG */
     .flower-garden-container {
       position: relative;
       width: 100%;
-      max-width: 420px;
-      height: 320px;
-      margin: 0.5rem auto 2rem auto;
+      max-width: 380px;
+      height: 290px;
+      margin: 0.5rem auto 1.8rem auto;
       display: flex;
       justify-content: center;
       align-items: flex-end;
@@ -154,7 +146,7 @@
     .garden-svg {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+      filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.45));
     }
 
     .flower-sway {
@@ -175,7 +167,7 @@
       100% { transform: rotate(-2deg); }
     }
 
-    /* Botones de acción */
+    /* Botones de acción interactiva */
     .interactive-section {
       width: 100%;
       margin-bottom: 2rem;
@@ -193,7 +185,7 @@
       background: linear-gradient(135deg, #ffd700, #ff9e00);
       color: #12101e;
       border: none;
-      padding: 12px 20px;
+      padding: 12px 18px;
       border-radius: 50px;
       font-family: inherit;
       font-size: 0.9rem;
@@ -203,8 +195,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 6px 20px rgba(255, 183, 3, 0.35);
-      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 6px 18px rgba(255, 183, 3, 0.4);
     }
     .magic-btn:active {
       transform: scale(0.96);
@@ -213,8 +204,8 @@
     .magic-btn.secondary {
       background: rgba(255, 255, 255, 0.08);
       color: #fefae0;
-      border: 1px solid var(--primary-yellow);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 1px solid #ffd700;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
     .magic-btn.secondary:active {
       background: rgba(255, 215, 0, 0.2);
@@ -223,20 +214,20 @@
     /* Carta de Amor */
     .love-letter-container {
       width: 100%;
-      background: rgba(25, 22, 40, 0.85);
-      border: 1px solid rgba(255, 215, 0, 0.35);
+      background: rgba(24, 20, 38, 0.9);
+      border: 1px solid rgba(255, 215, 0, 0.4);
       border-radius: 20px;
       padding: 1.8rem 1.4rem;
       margin-bottom: 2rem;
       position: relative;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       text-align: left;
     }
 
     .letter-title {
-      font-family: 'Caveat', cursive, sans-serif;
+      font-family: 'Brush Script MT', 'Segoe Script', 'Caveat', cursive, sans-serif;
       font-size: 2.2rem;
-      color: var(--primary-yellow);
+      color: #ffd700;
       margin-bottom: 0.8rem;
       text-align: center;
     }
@@ -252,17 +243,17 @@
       font-weight: 600;
     }
     .letter-signature {
-      font-family: 'Caveat', cursive, sans-serif;
+      font-family: 'Brush Script MT', 'Segoe Script', 'Caveat', cursive, sans-serif;
       font-size: 1.8rem;
-      color: var(--gold);
+      color: #ffb703;
       text-align: right;
       margin-top: 1rem;
     }
 
-    /* Cuadrícula de Tarjetas 2x2 */
+    /* Cuadrícula 2x2 */
     .section-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1rem;
       width: 100%;
       margin-bottom: 2.5rem;
@@ -270,15 +261,13 @@
 
     .romantic-card {
       background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--card-border);
+      border: 1px solid rgba(255, 215, 0, 0.25);
       border-radius: 16px;
       padding: 1.4rem;
       text-align: left;
-      transition: transform 0.2s ease, border-color 0.2s ease;
     }
     .romantic-card:active {
-      transform: scale(0.98);
-      border-color: var(--primary-yellow);
+      border-color: #ffd700;
     }
 
     .card-icon {
@@ -286,9 +275,9 @@
       margin-bottom: 0.5rem;
     }
     .card-title {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: Georgia, 'Times New Roman', serif;
       font-size: 1.15rem;
-      color: var(--soft-yellow);
+      color: #fff3b0;
       margin-bottom: 0.4rem;
     }
     .card-text {
@@ -313,24 +302,24 @@
       display: inline-block;
     }
 
-    /* Modal / Popups */
+    /* Modal Popups */
     .floating-popup {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
       background: #141224;
-      border: 2px solid var(--primary-yellow);
+      border: 2px solid #ffd700;
       border-radius: 20px;
       padding: 1.8rem 1.4rem;
       max-width: 90%;
-      width: 380px;
+      width: 360px;
       z-index: 1000;
       box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 215, 0, 0.3);
       text-align: center;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s ease;
     }
     .floating-popup.active {
       transform: translate(-50%, -50%) scale(1);
@@ -356,9 +345,9 @@
     }
 
     .popup-title {
-      font-family: 'Caveat', cursive, sans-serif;
+      font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
       font-size: 2.2rem;
-      color: var(--primary-yellow);
+      color: #ffd700;
       margin-bottom: 0.5rem;
     }
     .popup-text {
@@ -368,7 +357,7 @@
       margin-bottom: 1.2rem;
     }
     .popup-close {
-      background: var(--gold);
+      background: #ffb703;
       color: #0b0914;
       font-weight: 700;
       border: none;
@@ -376,15 +365,6 @@
       border-radius: 25px;
       cursor: pointer;
       font-size: 0.9rem;
-    }
-
-    /* Fallback en caso de pantallas muy pequeñas */
-    @media (max-width: 480px) {
-      .main-title { font-size: 1.8rem; }
-      .name-highlight { font-size: 2.8rem; }
-      .flower-garden-container { height: 260px; }
-      .love-letter-container { padding: 1.4rem 1rem; }
-      .letter-title { font-size: 1.9rem; }
     }
   </style>
 </head>
@@ -581,7 +561,7 @@
 
   <script>
     (function() {
-      // 1. CANVAS DE FONDO (Con soporte total para móviles)
+      // 1. CANVAS DE FONDO SEGURO
       const canvas = document.getElementById('background-canvas');
       if (canvas && canvas.getContext) {
         const ctx = canvas.getContext('2d');
@@ -598,7 +578,7 @@
         let stars = [];
         let petals = [];
 
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 40; i++) {
           stars.push({
             x: Math.random() * width,
             y: Math.random() * height,
@@ -622,7 +602,7 @@
           };
         }
 
-        for (let i = 0; i < 18; i++) {
+        for (let i = 0; i < 16; i++) {
           let p = makePetal();
           p.y = Math.random() * height;
           petals.push(p);
@@ -685,7 +665,7 @@
           spark.style.fontSize = '22px';
           spark.style.zIndex = '9999';
           spark.style.pointerEvents = 'none';
-          spark.style.transition = 'all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1)';
+          spark.style.transition = 'all 1.2s ease-out';
           spark.style.opacity = '1';
           document.body.appendChild(spark);
 
